@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>西新宿Darts&Bar Luu サービスアンケート</title>
+  <title>◯◯店 サービスアンケート</title>
   <style>
     body {
       font-family: sans-serif;
@@ -97,9 +97,11 @@
     button:hover {
       background-color: #45a049;
     }
-    #dynamic-form, #final-message {
+    #final-message {
       margin-top: 20px;
-      width: 100%;
+      font-weight: bold;
+      text-align: center;
+      color: #333;
     }
     .hidden {
       display: none;
@@ -108,8 +110,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>サービスアンケート</h1>
+    <h1>◯◯店 サービスアンケート</h1>
     <p>当店について、評価とご感想をお願いします。</p>
+
+    <textarea id="comment" placeholder="ご意見・ご感想を自由にご記入ください"></textarea>
 
     <div class="star-rating-wrapper">
       <div class="star-numbers">
@@ -124,63 +128,45 @@
       </div>
     </div>
 
-    <div id="dynamic-form"></div>
+    <button onclick="submitSurvey()">送信</button>
+
     <p id="final-message" class="hidden"></p>
   </div>
 
   <script>
-    const formContainer = document.getElementById("dynamic-form");
-    const finalMessage = document.getElementById("final-message");
+    function submitSurvey() {
+      const stars = document.querySelector('input[name="star"]:checked');
+      const comment = document.getElementById("comment").value.trim();
+      const finalMessage = document.getElementById("final-message");
 
-    document.getElementById("star-rating").addEventListener("click", () => {
-      const selected = document.querySelector('input[name="star"]:checked');
-      if (!selected) return;
-      const rating = parseInt(selected.value);
-      formContainer.innerHTML = ""; finalMessage.classList.add("hidden");
+      if (!stars) {
+        alert("評価を選択してください。");
+        return;
+      }
+      if (comment === "") {
+        alert("コメントを入力してください。");
+        return;
+      }
+
+      const rating = parseInt(stars.value);
+      finalMessage.classList.remove("hidden");
 
       if (rating <= 2) {
-        formContainer.innerHTML = \`
-          <textarea id="bad1" placeholder="ご不満に思われた点をお聞かせください"></textarea>
-          <textarea id="bad2" placeholder="どう改善すればよかったと感じられましたか？"></textarea>
-          <label>今回のようなことは以前にもありましたか？<br>
-            <select id="bad3"><option value="">選択してください</option><option>はい</option><option>いいえ</option></select>
-          </label>
-          <label>それでも今後、また来店したいと思いますか？<br>
-            <select id="bad4"><option value="">選択してください</option><option>はい</option><option>いいえ</option><option>未定</option></select>
-          </label>
-          <button onclick="showNegativeFinal()">送信</button>
+        finalMessage.innerHTML = \`
+          ご感想ありがとうございました。<br>
+          もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
+          「◯◯店」とGoogleで検索いただくことで、投稿も可能です。<br>
+          ※ご投稿はもちろん任意です。<br><br>
+          今回は誠にありがとうございました。<br>
+          今後も皆さまにとってより心地よいお店を目指してまいります。<br>
+          引き続きどうぞよろしくお願いいたします。
         \`;
       } else {
-        formContainer.innerHTML = \`
-          <textarea id="comment" placeholder="ご感想をお書きください"></textarea>
-          <button onclick="handlePositive()">送信</button>
-        \`;
+        navigator.clipboard.writeText(comment).then(() => {
+          window.open("https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8", "_blank");
+          finalMessage.innerHTML = "コメントをコピーしました。Googleレビュー投稿画面で貼り付けて投稿いただけます。";
+        });
       }
-    });
-
-    function showNegativeFinal() {
-      formContainer.innerHTML = "";
-      finalMessage.classList.remove("hidden");
-      finalMessage.innerHTML = \`
-        ご感想ありがとうございました。<br>
-        もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
-        「◯◯（店舗名）」とGoogleで検索いただくことで、投稿も可能です。<br>
-        ※ご投稿はもちろん任意です。<br><br>
-        今回は誠にありがとうございました。<br>
-        今後も皆さまにとってより心地よいお店を目指してまいります。<br>
-        引き続きどうぞよろしくお願いいたします。
-      \`;
-    }
-
-    function handlePositive() {
-      const comment = document.getElementById("comment").value.trim();
-      if (!comment) return alert("コメントを入力してください。");
-      navigator.clipboard.writeText(comment).then(() => {
-        window.open("https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8", "_blank");
-        finalMessage.classList.remove("hidden");
-        finalMessage.innerHTML = "コメントをコピーしました。Googleレビュー投稿画面で貼り付けて投稿いただけます。";
-        formContainer.innerHTML = "";
-      });
     }
   </script>
 </body>
