@@ -113,7 +113,7 @@
     <h1>◯◯店 サービスアンケート</h1>
     <p>当店について、評価とご感想をお願いします。</p>
 
-    <textarea id="comment" placeholder="ご意見・ご感想を自由にご記入ください"></textarea>
+    <textarea id="comment" placeholder="ご意見・ご感想を自由にご記入ください（任意）"></textarea>
 
     <div class="star-rating-wrapper">
       <div class="star-numbers">
@@ -143,13 +143,14 @@
         alert("評価を選択してください。");
         return;
       }
-      if (comment === "") {
-        alert("コメントを入力してください。");
-        return;
-      }
 
       const rating = parseInt(stars.value);
       finalMessage.classList.remove("hidden");
+
+      if (rating <= 2 && comment === "") {
+        alert("コメントを入力してください。");
+        return;
+      }
 
       if (rating <= 2) {
         finalMessage.innerHTML = \`
@@ -162,10 +163,19 @@
           引き続きどうぞよろしくお願いいたします。
         \`;
       } else {
-        navigator.clipboard.writeText(comment).then(() => {
-          window.open("https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8", "_blank");
-          finalMessage.innerHTML = "コメントをコピーしました。Googleレビュー投稿画面で貼り付けて投稿いただけます。";
-        });
+        const url = "https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8";
+        if (comment) {
+          navigator.clipboard.writeText(comment).then(() => {
+            window.open(url, "_blank");
+            finalMessage.innerHTML = "コメントをコピーしました。Googleレビュー投稿画面で貼り付けて投稿いただけます。";
+          }).catch(() => {
+            window.open(url, "_blank");
+            finalMessage.innerHTML = "Googleレビュー投稿画面が開きました。";
+          });
+        } else {
+          window.open(url, "_blank");
+          finalMessage.innerHTML = "Googleレビュー投稿画面が開きました。ご投稿はもちろん任意です。";
+        }
       }
     }
   </script>
