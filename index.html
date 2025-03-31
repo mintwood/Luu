@@ -109,6 +109,11 @@
     
     // 送信ボタン：評価に応じた分岐処理
     document.getElementById("submitBtn").addEventListener("click", () => {
+      // 星評価未選択の場合は入力促す
+      if(rating === 0) {
+        alert("星評価を選択してください。");
+        return;
+      }
       const comment = document.getElementById("comment").value.trim();
       document.getElementById("initialForm").classList.add("hidden");
       if(rating <= 2) {
