@@ -2,94 +2,166 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>◯◯店 サービスアンケート</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; }
-    .hidden { display: none; }
-    .step { margin-top: 20px; }
-    .button { margin-top: 10px; padding: 8px 16px; }
-    .star-rating span { font-size: 24px; cursor: pointer; }
-    .selected { color: gold; }
-    textarea { width: 100%; height: 80px; }
+    /* 共通スタイル */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7f7f7;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 20px auto;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 1.8em;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .star-rating {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .star-rating span {
+      font-size: 32px;
+      cursor: pointer;
+      padding: 0 4px;
+    }
+    .selected {
+      color: gold;
+    }
+    textarea {
+      width: 100%;
+      height: 80px;
+      resize: vertical;
+      padding: 10px;
+      font-size: 1em;
+      margin-bottom: 10px;
+    }
+    .step {
+      margin-top: 20px;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 1em;
+      margin-top: 10px;
+      display: inline-block;
+      border: none;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .button:active {
+      transform: scale(0.98);
+    }
+    .hidden {
+      display: none;
+    }
+    /* レスポンシブ調整 */
+    @media screen and (max-width: 600px) {
+      .container {
+        margin: 10px;
+        padding: 15px;
+      }
+      h1 {
+        font-size: 1.5em;
+      }
+      .star-rating span {
+        font-size: 28px;
+      }
+      .button {
+        width: 100%;
+        box-sizing: border-box;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>◯◯店 サービスアンケート</h1>
-  
-  <!-- 初期UI：星評価、コメント欄、送信ボタン -->
-  <div id="initialForm">
-    <div class="star-rating" id="starRating">
-      <span data-value="1">&#9733;</span>
-      <span data-value="2">&#9733;</span>
-      <span data-value="3">&#9733;</span>
-      <span data-value="4">&#9733;</span>
-      <span data-value="5">&#9733;</span>
+  <div class="container">
+    <h1>◯◯店 サービスアンケート</h1>
+    
+    <!-- 初期UI：星評価、コメント欄、送信ボタン -->
+    <div id="initialForm">
+      <div class="star-rating" id="starRating">
+        <span data-value="1">&#9733;</span>
+        <span data-value="2">&#9733;</span>
+        <span data-value="3">&#9733;</span>
+        <span data-value="4">&#9733;</span>
+        <span data-value="5">&#9733;</span>
+      </div>
+      <textarea id="comment" placeholder="ご意見・ご感想をお書きください"></textarea>
+      <button id="submitBtn" class="button">送信</button>
     </div>
-    <textarea id="comment" placeholder="ご意見・ご感想をお書きください"></textarea>
-    <br>
-    <button id="submitBtn" class="button">送信</button>
-  </div>
-  
-  <!-- 低評価用ステップ：各ステップごとに必須入力チェック付き -->
-  <div id="lowRatingFlow" class="hidden">
-    <!-- ステップ1 -->
-    <div id="lowStep1" class="step">
-      <label>【ステップ1】 ご不満に思われた点をお聞かせください：</label><br>
-      <textarea id="lowStep1Input" placeholder="例：待ち時間が長かった等"></textarea><br>
-      <button class="button" onclick="nextStep(1)">送信</button>
+    
+    <!-- 低評価用ステップ：各ステップごとに必須入力チェック付き -->
+    <div id="lowRatingFlow" class="hidden">
+      <!-- ステップ1 -->
+      <div id="lowStep1" class="step">
+        <label>【ステップ1】 ご不満に思われた点をお聞かせください：</label>
+        <textarea id="lowStep1Input" placeholder="例：待ち時間が長かった等"></textarea>
+        <button class="button" onclick="nextStep(1)">送信</button>
+      </div>
+      <!-- ステップ2 -->
+      <div id="lowStep2" class="step hidden">
+        <label>【ステップ2】 どのような改善があればよかったと感じられましたか？：</label>
+        <textarea id="lowStep2Input" placeholder="例：スタッフの対応改善等"></textarea>
+        <button class="button" onclick="nextStep(2)">送信</button>
+      </div>
+      <!-- ステップ3 -->
+      <div id="lowStep3" class="step hidden">
+        <label>【ステップ3】 今回のようなことは以前にもありましたか？</label><br>
+        <input type="radio" name="lowStep3" value="はい" id="lowStep3Yes">
+        <label for="lowStep3Yes">はい</label>
+        <input type="radio" name="lowStep3" value="いいえ" id="lowStep3No">
+        <label for="lowStep3No">いいえ</label><br>
+        <button class="button" onclick="nextStep(3)">送信</button>
+      </div>
+      <!-- ステップ4 -->
+      <div id="lowStep4" class="step hidden">
+        <label>【ステップ4】 今後またご来店いただけますか？</label><br>
+        <input type="radio" name="lowStep4" value="はい" id="lowStep4Yes">
+        <label for="lowStep4Yes">はい</label>
+        <input type="radio" name="lowStep4" value="いいえ" id="lowStep4No">
+        <label for="lowStep4No">いいえ</label><br>
+        <button class="button" onclick="nextStep(4)">送信</button>
+      </div>
+      <!-- ステップ5 -->
+      <div id="lowStep5" class="step hidden">
+        <p>
+          ご感想ありがとうございました。<br>
+          もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
+          ◯◯（店舗名）とGoogleで検索いただくことで、投稿も可能です。<br>
+          ※ご投稿はもちろん任意です。
+        </p>
+        <button class="button" onclick="finishLowRating()">完了</button>
+      </div>
     </div>
-    <!-- ステップ2 -->
-    <div id="lowStep2" class="step hidden">
-      <label>【ステップ2】 どのような改善があればよかったと感じられましたか？：</label><br>
-      <textarea id="lowStep2Input" placeholder="例：スタッフの対応改善等"></textarea><br>
-      <button class="button" onclick="nextStep(2)">送信</button>
-    </div>
-    <!-- ステップ3 -->
-    <div id="lowStep3" class="step hidden">
-      <label>【ステップ3】 今回のようなことは以前にもありましたか？</label><br>
-      <input type="radio" name="lowStep3" value="はい" id="lowStep3Yes">
-      <label for="lowStep3Yes">はい</label>
-      <input type="radio" name="lowStep3" value="いいえ" id="lowStep3No">
-      <label for="lowStep3No">いいえ</label><br>
-      <button class="button" onclick="nextStep(3)">送信</button>
-    </div>
-    <!-- ステップ4 -->
-    <div id="lowStep4" class="step hidden">
-      <label>【ステップ4】 今後またご来店いただけますか？</label><br>
-      <input type="radio" name="lowStep4" value="はい" id="lowStep4Yes">
-      <label for="lowStep4Yes">はい</label>
-      <input type="radio" name="lowStep4" value="いいえ" id="lowStep4No">
-      <label for="lowStep4No">いいえ</label><br>
-      <button class="button" onclick="nextStep(4)">送信</button>
-    </div>
-    <!-- ステップ5 -->
-    <div id="lowStep5" class="step hidden">
-      <p>
-        ご感想ありがとうございました。<br>
-        もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
-        ◯◯（店舗名）とGoogleで検索いただくことで、投稿も可能です。<br>
-        ※ご投稿はもちろん任意です。
-      </p>
-      <button class="button" onclick="finishLowRating()">完了</button>
-    </div>
-  </div>
-  
-  <!-- 高評価用ステップ（★3〜5） -->
-  <div id="highRatingSteps" class="hidden">
-    <div class="step" id="highCommentDisplay">
-      <!-- 入力されたコメントが表示される -->
-    </div>
-    <div class="step" id="copyButtonSection">
-      <button id="copyCommentBtn" class="button">このコメントをコピー</button>
-    </div>
-    <div class="step">
-      <p>
-        ご感想ありがとうございました。<br>
-        このコメントをGoogleレビューに投稿しますか？<br>
-        ※ご投稿はもちろん任意です。
-      </p>
-      <button id="postReviewBtn" class="button">はい、投稿する</button>
-      <button id="noPostBtn" class="button">今回は投稿しない</button>
+    
+    <!-- 高評価用ステップ（★3〜5） -->
+    <div id="highRatingSteps" class="hidden">
+      <div class="step" id="highCommentDisplay">
+        <!-- 入力されたコメントが表示される -->
+      </div>
+      <div class="step" id="copyButtonSection">
+        <button id="copyCommentBtn" class="button">このコメントをコピー</button>
+      </div>
+      <div class="step">
+        <p>
+          ご感想ありがとうございました。<br>
+          このコメントをGoogleレビューに投稿しますか？<br>
+          ※ご投稿はもちろん任意です。
+        </p>
+        <button id="postReviewBtn" class="button">はい、投稿する</button>
+        <button id="noPostBtn" class="button">今回は投稿しない</button>
+      </div>
     </div>
   </div>
   
