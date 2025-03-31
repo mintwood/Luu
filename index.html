@@ -30,30 +30,47 @@
     <button id="submitBtn" class="button">送信</button>
   </div>
   
-  <!-- 低評価用ステップ（★1〜2）：Googleレビュー投稿画面へのボタンはなし -->
-  <div id="lowRatingSteps" class="hidden">
-    <div class="step">
-      <label>【ステップ1】ご不満に思われた点をお聞かせください：</label><br>
-      <textarea id="lowStep1"></textarea>
+  <!-- 低評価用ステップ：各ステップごとに送信ボタンで進行 -->
+  <div id="lowRatingFlow" class="hidden">
+    <!-- ステップ1 -->
+    <div id="lowStep1" class="step">
+      <label>【ステップ1】 ご不満に思われた点をお聞かせください：</label><br>
+      <textarea id="lowStep1Input"></textarea><br>
+      <button class="button" onclick="nextStep(1)">送信</button>
     </div>
-    <div class="step">
-      <label>【ステップ2】どのような改善があればよかったと感じられましたか？：</label><br>
-      <textarea id="lowStep2"></textarea>
+    <!-- ステップ2 -->
+    <div id="lowStep2" class="step hidden">
+      <label>【ステップ2】 どのような改善があればよかったと感じられましたか？：</label><br>
+      <textarea id="lowStep2Input"></textarea><br>
+      <button class="button" onclick="nextStep(2)">送信</button>
     </div>
-    <div class="step">
-      <label>【ステップ3】今回のようなことは以前にもありましたか？</label><br>
-      <input type="radio" name="lowStep3" value="はい">はい
-      <input type="radio" name="lowStep3" value="いいえ">いいえ
+    <!-- ステップ3 -->
+    <div id="lowStep3" class="step hidden">
+      <label>【ステップ3】 今回のようなことは以前にもありましたか？</label><br>
+      <input type="radio" name="lowStep3" value="はい" id="lowStep3Yes">
+      <label for="lowStep3Yes">はい</label>
+      <input type="radio" name="lowStep3" value="いいえ" id="lowStep3No">
+      <label for="lowStep3No">いいえ</label><br>
+      <button class="button" onclick="nextStep(3)">送信</button>
     </div>
-    <div class="step">
-      <label>【ステップ4】今後またご来店いただけますか？</label><br>
-      <input type="radio" name="lowStep4" value="はい">はい
-      <input type="radio" name="lowStep4" value="いいえ">いいえ
+    <!-- ステップ4 -->
+    <div id="lowStep4" class="step hidden">
+      <label>【ステップ4】 今後またご来店いただけますか？</label><br>
+      <input type="radio" name="lowStep4" value="はい" id="lowStep4Yes">
+      <label for="lowStep4Yes">はい</label>
+      <input type="radio" name="lowStep4" value="いいえ" id="lowStep4No">
+      <label for="lowStep4No">いいえ</label><br>
+      <button class="button" onclick="nextStep(4)">送信</button>
     </div>
-    <div class="step">
-      <p>ご感想ありがとうございました。<br>
-      もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、◯◯（店舗名）とGoogleで検索いただくことで、投稿も可能です。<br>
-      ※ご投稿はもちろん任意です。</p>
+    <!-- ステップ5 -->
+    <div id="lowStep5" class="step hidden">
+      <p>
+        ご感想ありがとうございました。<br>
+        もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
+        ◯◯（店舗名）とGoogleで検索いただくことで、投稿も可能です。<br>
+        ※ご投稿はもちろん任意です。
+      </p>
+      <button class="button" onclick="finishLowRating()">完了</button>
     </div>
   </div>
   
@@ -66,16 +83,17 @@
       <button id="copyCommentBtn" class="button">このコメントをコピー</button>
     </div>
     <div class="step">
-      <p>ご感想ありがとうございました。<br>
-      このコメントをGoogleレビューに投稿しますか？<br>
-      ※ご投稿はもちろん任意です。</p>
+      <p>
+        ご感想ありがとうございました。<br>
+        このコメントをGoogleレビューに投稿しますか？<br>
+        ※ご投稿はもちろん任意です。
+      </p>
       <button id="postReviewBtn" class="button">はい、投稿する</button>
       <button id="noPostBtn" class="button">今回は投稿しない</button>
     </div>
   </div>
   
   <script>
-    // 評価値とUI制御用変数
     let rating = 0;
     
     // 星評価クリックイベント設定
@@ -83,26 +101,20 @@
     stars.forEach(star => {
       star.addEventListener("click", () => {
         rating = parseInt(star.getAttribute("data-value"));
-        // 選択状態を表示
         stars.forEach(s => {
           s.classList.toggle("selected", parseInt(s.getAttribute("data-value")) <= rating);
         });
       });
     });
     
-    // 送信ボタンイベント
+    // 送信ボタン：評価に応じた分岐処理
     document.getElementById("submitBtn").addEventListener("click", () => {
-      // 入力コメント取得
       const comment = document.getElementById("comment").value.trim();
       document.getElementById("initialForm").classList.add("hidden");
-      
       if(rating <= 2) {
-        // 低評価の場合の処理（★1〜2）
-        document.getElementById("lowRatingSteps").classList.remove("hidden");
+        document.getElementById("lowRatingFlow").classList.remove("hidden");
       } else {
-        // 高評価の場合の処理（★3〜5）
         document.getElementById("highRatingSteps").classList.remove("hidden");
-        // コメントがある場合、表示
         if(comment !== ""){
           document.getElementById("highCommentDisplay").innerText = comment;
         } else {
@@ -110,6 +122,19 @@
         }
       }
     });
+    
+    // 低評価ステップ用：次のステップへ進む
+    function nextStep(step) {
+      document.getElementById("lowStep" + step).classList.add("hidden");
+      let next = step + 1;
+      document.getElementById("lowStep" + next).classList.remove("hidden");
+    }
+    
+    // 低評価ステップ完了時の処理
+    function finishLowRating() {
+      // 完了時の感謝メッセージ（必要に応じてサーバーへ送信など追加可能）
+      document.getElementById("lowRatingFlow").innerHTML = "<p>ご協力ありがとうございました。またのご来店を心よりお待ちしております。</p>";
+    }
     
     // 高評価：コメントコピー機能
     document.getElementById("copyCommentBtn").addEventListener("click", () => {
@@ -119,12 +144,12 @@
       });
     });
     
-    // 高評価：投稿するボタンでGoogleレビュー画面を新規タブで開く
+    // 高評価：Googleレビュー投稿画面への遷移
     document.getElementById("postReviewBtn").addEventListener("click", () => {
       window.open("https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8", "_blank");
     });
     
-    // 高評価：今回は投稿しないボタン
+    // 高評価：投稿しない場合の処理
     document.getElementById("noPostBtn").addEventListener("click", () => {
       alert("ご利用ありがとうございました");
     });
