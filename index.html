@@ -91,6 +91,9 @@
 .copy-button:hover {
   background-color: #d63384; /* 下に少し動く */
 }
+.center-wrapper {
+  text-align: center;
+}
     /* レスポンシブ調整 */
     @media screen and (max-width: 600px) {
       .container {
@@ -181,10 +184,13 @@
     <!-- 入力されたコメントが表示される -->
   </div>
 
-  <div class="step" id="copyButtonSection">
+<div class="step" id="copyButtonSection">
+  <div class="center-wrapper">
     <button id="copyCommentBtn" class="button copy-button">このコメントをコピー</button>
-    <div class="arrow-down">▼</div> <!-- ここが矢印 -->
+    <div class="arrow-down">▼</div>
   </div>
+</div>
+
 
   <div class="step">
     <button id="postReviewBtn" class="button">はい、投稿する</button>
