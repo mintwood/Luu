@@ -2,245 +2,165 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>◯◯店 サービスアンケート</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f9f9f9;
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      width: 100%;
-      max-width: 500px;
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-    }
-    /* 星評価用のラベル表示 (左に1, 右に5) */
-    .label-row {
-      display: flex;
-      justify-content: space-between;
-      max-width: 250px;
-      margin: 0 auto 5px;
-      font-size: 1rem;
-      color: #333;
-    }
-    /* 星コンテナ：左→右に並べる */
-    .stars {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      max-width: 250px;
-      margin: 0 auto 20px;
-    }
-    /* ラジオボタンは非表示 */
-    .stars input {
-      display: none;
-    }
-    /* 星のスタイル */
-    .stars label {
-      font-size: 2.2rem;
-      color: #ccc;
-      cursor: pointer;
-      padding: 0 5px;
-    }
-    /* クリックされた星だけ着色する (簡易実装) */
-    .stars input:checked + label {
-      color: gold;
-    }
-
-    /* コメント欄 */
-    textarea {
-      width: 100%;
-      height: 120px;
-      padding: 10px;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      resize: vertical;
-    }
-
-    /* 送信ボタン */
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      font-size: 1.1rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-
-    /* 2択ボタンやメッセージ */
-    .choice-buttons {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
-    }
-    .choice-buttons button {
-      width: 45%;
-      padding: 10px;
-      font-size: 1rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .yes-btn {
-      background-color: #2196F3;
-      color: white;
-    }
-    .yes-btn:hover {
-      background-color: #1976D2;
-    }
-    .no-btn {
-      background-color: #f57c00;
-      color: white;
-    }
-    .no-btn:hover {
-      background-color: #e65100;
-    }
-
-    #final-message {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
-      color: #333;
-    }
-    .hidden {
-      display: none;
-    }
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 20px auto; }
+    .hidden { display: none; }
+    .step { margin-top: 20px; }
+    .button { margin-top: 10px; padding: 8px 16px; }
+    .star-rating span { font-size: 24px; cursor: pointer; }
+    .selected { color: gold; }
+    textarea { width: 100%; height: 80px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>◯◯店 サービスアンケート</h1>
-
-    <!-- ラベル（左に1、右に5） -->
-    <div class="label-row">
-      <span>1</span>
-      <span>5</span>
+  <h1>◯◯店 サービスアンケート</h1>
+  
+  <!-- 初期UI：星評価、コメント欄、送信ボタン -->
+  <div id="initialForm">
+    <div class="star-rating" id="starRating">
+      <!-- ★1〜5（クリックで評価） -->
+      <span data-value="1">&#9733;</span>
+      <span data-value="2">&#9733;</span>
+      <span data-value="3">&#9733;</span>
+      <span data-value="4">&#9733;</span>
+      <span data-value="5">&#9733;</span>
     </div>
-
-    <!-- 星評価：左から1→2→3→4→5 -->
-    <div class="stars" id="star-rating">
-      <input type="radio" name="star" id="star1" value="1">
-      <label for="star1">★</label>
-
-      <input type="radio" name="star" id="star2" value="2">
-      <label for="star2">★</label>
-
-      <input type="radio" name="star" id="star3" value="3">
-      <label for="star3">★</label>
-
-      <input type="radio" name="star" id="star4" value="4">
-      <label for="star4">★</label>
-
-      <input type="radio" name="star" id="star5" value="5">
-      <label for="star5">★</label>
-    </div>
-
-    <!-- コメント入力欄 -->
     <textarea id="comment" placeholder="ご意見・ご感想をお書きください"></textarea>
-
-    <!-- 送信ボタン -->
-    <button onclick="submitSurvey()">送信</button>
-
-    <!-- 高評価用の2択エリア -->
-    <div id="choice-area" class="hidden">
-      <p style="text-align:center;">
-        ご感想ありがとうございました。<br>
-        このコメントをGoogleレビューに投稿しますか？<br>
-        ※ご投稿はもちろん任意です。
-      </p>
-      <div class="choice-buttons">
-        <button class="yes-btn" onclick="handleReview(true)">はい、投稿します</button>
-        <button class="no-btn" onclick="handleReview(false)">今回は投稿しません</button>
-      </div>
-    </div>
-
-    <!-- 最終メッセージ表示エリア -->
-    <p id="final-message" class="hidden"></p>
+    <br>
+    <button id="submitBtn" class="button">送信</button>
   </div>
-
+  
+  <!-- 低評価用ステップ -->
+  <div id="lowRatingSteps" class="hidden">
+    <div class="step">
+      <label>【ステップ1】ご不満に思われた点をお聞かせください：</label><br>
+      <textarea id="lowStep1"></textarea>
+    </div>
+    <div class="step">
+      <label>【ステップ2】どのような改善があればよかったと感じられましたか？：</label><br>
+      <textarea id="lowStep2"></textarea>
+    </div>
+    <div class="step">
+      <label>【ステップ3】今回のようなことは以前にもありましたか？：</label><br>
+      <select id="lowStep3">
+        <option value="">選択してください</option>
+        <option value="はい">はい</option>
+        <option value="いいえ">いいえ</option>
+      </select>
+    </div>
+    <div class="step">
+      <label>【ステップ4】今後またご来店いただけますか？：</label><br>
+      <select id="lowStep4">
+        <option value="">選択してください</option>
+        <option value="はい">はい</option>
+        <option value="いいえ">いいえ</option>
+      </select>
+    </div>
+    <div class="step">
+      <p>ご感想ありがとうございました。<br>
+         もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
+         「◯◯（店舗名）」とGoogleで検索いただくことで、投稿も可能です。<br>
+         ※ご投稿はもちろん任意です。</p>
+      <button id="lowGoogleBtn" class="button">Googleレビュー投稿画面へ</button>
+    </div>
+  </div>
+  
+  <!-- 高評価用ステップ -->
+  <div id="highRatingSteps" class="hidden">
+    <div id="displayedComment" class="step hidden">
+      <p>【入力されたご感想】</p>
+      <div id="copiedComment" style="border: 1px solid #ccc; padding: 10px;"></div>
+      <button id="copyBtn" class="button">このコメントをコピー</button>
+    </div>
+    <div class="step">
+      <p>ご感想ありがとうございました。<br>
+         このコメントをGoogleレビューに投稿しますか？<br>
+         ※ご投稿はもちろん任意です。</p>
+      <button id="highYesBtn" class="button">はい、投稿する</button>
+      <button id="highNoBtn" class="button">今回は投稿しない</button>
+    </div>
+    <div id="highThanks" class="step hidden">
+      <p>ご回答ありがとうございました。</p>
+    </div>
+  </div>
+  
   <script>
-    function submitSurvey() {
-      const stars = document.querySelector('input[name="star"]:checked');
-      const comment = document.getElementById("comment").value.trim();
-      const finalMessage = document.getElementById("final-message");
-      const choiceArea = document.getElementById("choice-area");
+    let selectedRating = 0;
+    const starElements = document.querySelectorAll('#starRating span');
+    const commentEl = document.getElementById('comment');
+    const submitBtn = document.getElementById('submitBtn');
+    const lowRatingSteps = document.getElementById('lowRatingSteps');
+    const highRatingSteps = document.getElementById('highRatingSteps');
+    const displayedComment = document.getElementById('displayedComment');
+    const copiedComment = document.getElementById('copiedComment');
+    const copyBtn = document.getElementById('copyBtn');
+    const highYesBtn = document.getElementById('highYesBtn');
+    const highNoBtn = document.getElementById('highNoBtn');
+    const highThanks = document.getElementById('highThanks');
+    const lowGoogleBtn = document.getElementById('lowGoogleBtn');
 
-      // 初期化
-      finalMessage.classList.add("hidden");
-      choiceArea.classList.add("hidden");
+    // 星評価クリック処理
+    starElements.forEach(function(star) {
+      star.addEventListener('click', function() {
+        selectedRating = parseInt(this.getAttribute('data-value'));
+        // 全ての星をリセット
+        starElements.forEach(s => s.classList.remove('selected'));
+        // 選択した評価までをハイライト
+        for(let i = 0; i < selectedRating; i++){
+          starElements[i].classList.add('selected');
+        }
+      });
+    });
 
-      // 星が未選択なら警告
-      if (!stars) {
-        alert("評価を選択してください。");
+    // 送信ボタンのクリックイベント
+    submitBtn.addEventListener('click', function() {
+      if(selectedRating === 0) {
+        alert("評価（★）を選択してください。");
         return;
       }
-      const rating = parseInt(stars.value);
-
-      if (rating <= 2) {
-        // 低評価（★1〜2）
-        finalMessage.innerHTML = "ご感想ありがとうございました。<br>いただいたご意見は店舗内で共有し、サービス改善に活かしてまいります。";
-        finalMessage.classList.remove("hidden");
+      // 初期フォームを非表示
+      document.getElementById('initialForm').classList.add('hidden');
+      
+      if(selectedRating <= 2) {
+        // 低評価の場合、低評価ステップを表示
+        lowRatingSteps.classList.remove('hidden');
       } else {
-        // 高評価（★3〜5）
-        choiceArea.classList.remove("hidden");
-      }
-    }
-
-    function handleReview(isSubmit) {
-      const comment = document.getElementById("comment").value.trim();
-      const finalMessage = document.getElementById("final-message");
-      const choiceArea = document.getElementById("choice-area");
-      const reviewURL = "https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8"; // 適宜変更
-
-      // 2択ダイアログを隠す
-      choiceArea.classList.add("hidden");
-
-      if (isSubmit) {
-        // ユーザーが「投稿する」を選んだ場合
-        if (comment) {
-          // コメントがある場合はコピー
-          navigator.clipboard.writeText(comment).then(() => {
-            window.open(reviewURL, "_blank");
-            finalMessage.innerHTML = "コメントをコピーしました。<br>Googleレビュー投稿画面が開きました。";
-            finalMessage.classList.remove("hidden");
-          }).catch(() => {
-            // コピー失敗時もリンクだけは開く
-            window.open(reviewURL, "_blank");
-            finalMessage.innerHTML = "Googleレビュー投稿画面が開きました。";
-            finalMessage.classList.remove("hidden");
-          });
-        } else {
-          // コメントが空欄ならコピーはせずにそのままリンク
-          window.open(reviewURL, "_blank");
-          finalMessage.innerHTML = "Googleレビュー投稿画面が開きました。";
-          finalMessage.classList.remove("hidden");
+        // 高評価の場合、入力コメントの有無で表示分岐
+        const commentValue = commentEl.value.trim();
+        if(commentValue !== ""){
+          copiedComment.textContent = commentValue;
+          displayedComment.classList.remove('hidden');
         }
-      } else {
-        // 「今回は投稿しない」を選んだ場合
-        finalMessage.innerHTML = "ご感想ありがとうございました。<br>今後ともどうぞよろしくお願いいたします。";
-        finalMessage.classList.remove("hidden");
+        highRatingSteps.classList.remove('hidden');
       }
-    }
+    });
+
+    // 「このコメントをコピー」ボタン処理
+    copyBtn.addEventListener('click', function() {
+      const textToCopy = copiedComment.textContent;
+      navigator.clipboard.writeText(textToCopy).then(function() {
+        alert("コメントがコピーされました。");
+      }, function(err) {
+        alert("コピーに失敗しました。ブラウザの設定をご確認ください。");
+      });
+    });
+
+    // 高評価「はい、投稿する」ボタン処理
+    highYesBtn.addEventListener('click', function() {
+      // Googleレビュー投稿画面への遷移（例：URLを指定）
+      window.open("https://www.google.com/search?q=◯◯店舗+Googleレビュー", "_blank");
+    });
+
+    // 高評価「今回は投稿しない」ボタン処理
+    highNoBtn.addEventListener('click', function() {
+      highThanks.classList.remove('hidden');
+    });
+
+    // 低評価「Googleレビュー投稿画面へ」ボタン処理
+    lowGoogleBtn.addEventListener('click', function() {
+      window.open("https://www.google.com/search?q=◯◯店舗+Googleレビュー", "_blank");
+    });
   </script>
 </body>
 </html>
