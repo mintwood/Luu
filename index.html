@@ -66,6 +66,14 @@
     .hidden {
       display: none;
     }
+    /* コピーボタンの色 */
+.copy-button {
+  background-color: #e83e8c;
+  color: #fff;
+}
+.copy-button:hover {
+  background-color: #d63384;
+}
     /* レスポンシブ調整 */
     @media screen and (max-width: 600px) {
       .container {
@@ -158,7 +166,7 @@
   </div>
 
   <div class="step" id="copyButtonSection">
-    <button id="copyCommentBtn" class="button">このコメントをコピー</button>
+    <button id="copyCommentBtn" class="button copy-button">このコメントをコピー</button>
   </div>
 
   <div class="step">
