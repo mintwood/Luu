@@ -19,7 +19,6 @@
   <!-- 初期UI：星評価、コメント欄、送信ボタン -->
   <div id="initialForm">
     <div class="star-rating" id="starRating">
-      <!-- ★1〜5（クリックで評価） -->
       <span data-value="1">&#9733;</span>
       <span data-value="2">&#9733;</span>
       <span data-value="3">&#9733;</span>
@@ -31,7 +30,7 @@
     <button id="submitBtn" class="button">送信</button>
   </div>
   
-  <!-- 低評価用ステップ -->
+  <!-- 低評価用ステップ（★1〜2）：Googleレビュー投稿画面へのボタンはなし -->
   <div id="lowRatingSteps" class="hidden">
     <div class="step">
       <label>【ステップ1】ご不満に思われた点をお聞かせください：</label><br>
@@ -42,124 +41,92 @@
       <textarea id="lowStep2"></textarea>
     </div>
     <div class="step">
-      <label>【ステップ3】今回のようなことは以前にもありましたか？：</label><br>
-      <select id="lowStep3">
-        <option value="">選択してください</option>
-        <option value="はい">はい</option>
-        <option value="いいえ">いいえ</option>
-      </select>
+      <label>【ステップ3】今回のようなことは以前にもありましたか？</label><br>
+      <input type="radio" name="lowStep3" value="はい">はい
+      <input type="radio" name="lowStep3" value="いいえ">いいえ
     </div>
     <div class="step">
-      <label>【ステップ4】今後またご来店いただけますか？：</label><br>
-      <select id="lowStep4">
-        <option value="">選択してください</option>
-        <option value="はい">はい</option>
-        <option value="いいえ">いいえ</option>
-      </select>
+      <label>【ステップ4】今後またご来店いただけますか？</label><br>
+      <input type="radio" name="lowStep4" value="はい">はい
+      <input type="radio" name="lowStep4" value="いいえ">いいえ
     </div>
     <div class="step">
       <p>ご感想ありがとうございました。<br>
-         もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
-         「◯◯（店舗名）」とGoogleで検索いただくことで、投稿も可能です。<br>
-         ※ご投稿はもちろん任意です。</p>
-      <button id="lowGoogleBtn" class="button">Googleレビュー投稿画面へ</button>
+      もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、◯◯（店舗名）とGoogleで検索いただくことで、投稿も可能です。<br>
+      ※ご投稿はもちろん任意です。</p>
     </div>
   </div>
   
-  <!-- 高評価用ステップ -->
+  <!-- 高評価用ステップ（★3〜5） -->
   <div id="highRatingSteps" class="hidden">
-    <div id="displayedComment" class="step hidden">
-      <p>【入力されたご感想】</p>
-      <div id="copiedComment" style="border: 1px solid #ccc; padding: 10px;"></div>
-      <button id="copyBtn" class="button">このコメントをコピー</button>
+    <div class="step" id="highCommentDisplay">
+      <!-- 入力されたコメントが表示される -->
+    </div>
+    <div class="step" id="copyButtonSection">
+      <button id="copyCommentBtn" class="button">このコメントをコピー</button>
     </div>
     <div class="step">
       <p>ご感想ありがとうございました。<br>
-         このコメントをGoogleレビューに投稿しますか？<br>
-         ※ご投稿はもちろん任意です。</p>
-      <button id="highYesBtn" class="button">はい、投稿する</button>
-      <button id="highNoBtn" class="button">今回は投稿しない</button>
-    </div>
-    <div id="highThanks" class="step hidden">
-      <p>ご回答ありがとうございました。</p>
+      このコメントをGoogleレビューに投稿しますか？<br>
+      ※ご投稿はもちろん任意です。</p>
+      <button id="postReviewBtn" class="button">はい、投稿する</button>
+      <button id="noPostBtn" class="button">今回は投稿しない</button>
     </div>
   </div>
   
   <script>
-    let selectedRating = 0;
-    const starElements = document.querySelectorAll('#starRating span');
-    const commentEl = document.getElementById('comment');
-    const submitBtn = document.getElementById('submitBtn');
-    const lowRatingSteps = document.getElementById('lowRatingSteps');
-    const highRatingSteps = document.getElementById('highRatingSteps');
-    const displayedComment = document.getElementById('displayedComment');
-    const copiedComment = document.getElementById('copiedComment');
-    const copyBtn = document.getElementById('copyBtn');
-    const highYesBtn = document.getElementById('highYesBtn');
-    const highNoBtn = document.getElementById('highNoBtn');
-    const highThanks = document.getElementById('highThanks');
-    const lowGoogleBtn = document.getElementById('lowGoogleBtn');
-
-    // 星評価クリック処理
-    starElements.forEach(function(star) {
-      star.addEventListener('click', function() {
-        selectedRating = parseInt(this.getAttribute('data-value'));
-        // 全ての星をリセット
-        starElements.forEach(s => s.classList.remove('selected'));
-        // 選択した評価までをハイライト
-        for(let i = 0; i < selectedRating; i++){
-          starElements[i].classList.add('selected');
-        }
+    // 評価値とUI制御用変数
+    let rating = 0;
+    
+    // 星評価クリックイベント設定
+    const stars = document.querySelectorAll("#starRating span");
+    stars.forEach(star => {
+      star.addEventListener("click", () => {
+        rating = parseInt(star.getAttribute("data-value"));
+        // 選択状態を表示
+        stars.forEach(s => {
+          s.classList.toggle("selected", parseInt(s.getAttribute("data-value")) <= rating);
+        });
       });
     });
-
-    // 送信ボタンのクリックイベント
-    submitBtn.addEventListener('click', function() {
-      if(selectedRating === 0) {
-        alert("評価（★）を選択してください。");
-        return;
-      }
-      // 初期フォームを非表示
-      document.getElementById('initialForm').classList.add('hidden');
+    
+    // 送信ボタンイベント
+    document.getElementById("submitBtn").addEventListener("click", () => {
+      // 入力コメント取得
+      const comment = document.getElementById("comment").value.trim();
+      document.getElementById("initialForm").classList.add("hidden");
       
-      if(selectedRating <= 2) {
-        // 低評価の場合、低評価ステップを表示
-        lowRatingSteps.classList.remove('hidden');
+      if(rating <= 2) {
+        // 低評価の場合の処理（★1〜2）
+        document.getElementById("lowRatingSteps").classList.remove("hidden");
       } else {
-        // 高評価の場合、入力コメントの有無で表示分岐
-        const commentValue = commentEl.value.trim();
-        if(commentValue !== ""){
-          copiedComment.textContent = commentValue;
-          displayedComment.classList.remove('hidden');
+        // 高評価の場合の処理（★3〜5）
+        document.getElementById("highRatingSteps").classList.remove("hidden");
+        // コメントがある場合、表示
+        if(comment !== ""){
+          document.getElementById("highCommentDisplay").innerText = comment;
+        } else {
+          document.getElementById("copyButtonSection").classList.add("hidden");
         }
-        highRatingSteps.classList.remove('hidden');
       }
     });
-
-    // 「このコメントをコピー」ボタン処理
-    copyBtn.addEventListener('click', function() {
-      const textToCopy = copiedComment.textContent;
-      navigator.clipboard.writeText(textToCopy).then(function() {
-        alert("コメントがコピーされました。");
-      }, function(err) {
-        alert("コピーに失敗しました。ブラウザの設定をご確認ください。");
+    
+    // 高評価：コメントコピー機能
+    document.getElementById("copyCommentBtn").addEventListener("click", () => {
+      const comment = document.getElementById("comment").value;
+      navigator.clipboard.writeText(comment).then(() => {
+        alert("コメントがコピーされました");
       });
     });
-
-    // 高評価「はい、投稿する」ボタン処理
-    highYesBtn.addEventListener('click', function() {
-      // Googleレビュー投稿画面への遷移（例：URLを指定）
-      window.open("https://www.google.com/search?q=◯◯店舗+Googleレビュー", "_blank");
+    
+    // 高評価：投稿するボタンでGoogleレビュー画面を新規タブで開く
+    document.getElementById("postReviewBtn").addEventListener("click", () => {
+      window.open("https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR", "_blank");
     });
-
-    // 高評価「今回は投稿しない」ボタン処理
-    highNoBtn.addEventListener('click', function() {
-      highThanks.classList.remove('hidden');
-    });
-
-    // 低評価「Googleレビュー投稿画面へ」ボタン処理
-    lowGoogleBtn.addEventListener('click', function() {
-      window.open("https://www.google.com/search?q=◯◯店舗+Googleレビュー", "_blank");
+    
+    // 高評価：今回は投稿しないボタン
+    document.getElementById("noPostBtn").addEventListener("click", () => {
+      alert("ご利用ありがとうございました");
     });
   </script>
 </body>
