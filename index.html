@@ -30,18 +30,18 @@
     <button id="submitBtn" class="button">送信</button>
   </div>
   
-  <!-- 低評価用ステップ：各ステップごとに送信ボタンで進行 -->
+  <!-- 低評価用ステップ：各ステップごとに必須入力チェック付き -->
   <div id="lowRatingFlow" class="hidden">
     <!-- ステップ1 -->
     <div id="lowStep1" class="step">
       <label>【ステップ1】 ご不満に思われた点をお聞かせください：</label><br>
-      <textarea id="lowStep1Input"></textarea><br>
+      <textarea id="lowStep1Input" placeholder="例：待ち時間が長かった等"></textarea><br>
       <button class="button" onclick="nextStep(1)">送信</button>
     </div>
     <!-- ステップ2 -->
     <div id="lowStep2" class="step hidden">
       <label>【ステップ2】 どのような改善があればよかったと感じられましたか？：</label><br>
-      <textarea id="lowStep2Input"></textarea><br>
+      <textarea id="lowStep2Input" placeholder="例：スタッフの対応改善等"></textarea><br>
       <button class="button" onclick="nextStep(2)">送信</button>
     </div>
     <!-- ステップ3 -->
@@ -123,16 +123,52 @@
       }
     });
     
-    // 低評価ステップ用：次のステップへ進む
+    // 低評価ステップ用：次のステップへ進む前に必須入力チェックを実施
     function nextStep(step) {
-      document.getElementById("lowStep" + step).classList.add("hidden");
-      let next = step + 1;
-      document.getElementById("lowStep" + next).classList.remove("hidden");
+      let valid = true;
+      if(step === 1) {
+        const input = document.getElementById("lowStep1Input").value.trim();
+        if(input === ""){
+          alert("必須項目です。ご入力ください。");
+          valid = false;
+        }
+      } else if(step === 2) {
+        const input = document.getElementById("lowStep2Input").value.trim();
+        if(input === ""){
+          alert("必須項目です。ご入力ください。");
+          valid = false;
+        }
+      } else if(step === 3) {
+        const radios = document.getElementsByName("lowStep3");
+        let checked = false;
+        for(let i = 0; i < radios.length; i++){
+          if(radios[i].checked){ checked = true; break; }
+        }
+        if(!checked){
+          alert("必須項目です。選択してください。");
+          valid = false;
+        }
+      } else if(step === 4) {
+        const radios = document.getElementsByName("lowStep4");
+        let checked = false;
+        for(let i = 0; i < radios.length; i++){
+          if(radios[i].checked){ checked = true; break; }
+        }
+        if(!checked){
+          alert("必須項目です。選択してください。");
+          valid = false;
+        }
+      }
+      
+      if(valid) {
+        document.getElementById("lowStep" + step).classList.add("hidden");
+        let next = step + 1;
+        document.getElementById("lowStep" + next).classList.remove("hidden");
+      }
     }
     
     // 低評価ステップ完了時の処理
     function finishLowRating() {
-      // 完了時の感謝メッセージ（必要に応じてサーバーへ送信など追加可能）
       document.getElementById("lowRatingFlow").innerHTML = "<p>ご協力ありがとうございました。またのご来店を心よりお待ちしております。</p>";
     }
     
