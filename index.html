@@ -66,6 +66,24 @@
     .hidden {
       display: none;
     }
+.arrow-down {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 10px;
+  color: #555;
+  animation: bounce 1.2s infinite;
+}
+
+/* ふわっと上下に動くアニメーション */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
     /* コピーボタンの色 */
 .copy-button {
   background-color: #e83e8c;
@@ -166,6 +184,7 @@
 
   <div class="step" id="copyButtonSection">
     <button id="copyCommentBtn" class="button copy-button">このコメントをコピー</button>
+    <div class="arrow-down">▼</div> <!-- ここが矢印 -->
   </div>
 
   <div class="step">
