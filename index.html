@@ -82,6 +82,27 @@
         box-sizing: border-box;
       }
     }
+
+    .star-rating {
+  position: relative; /* rating-labelsの絶対配置のために必要 */
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.rating-labels {
+  position: absolute;
+  top: -20px; /* 星の上に配置 */
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+
+.rating-labels .label-left,
+.rating-labels .label-right {
+  font-size: 14px;
+  color: #555;
+}
   </style>
 </head>
 <body>
@@ -90,13 +111,17 @@
     
     <!-- 初期UI：星評価、コメント欄、送信ボタン -->
     <div id="initialForm">
-      <div class="star-rating" id="starRating">
-        <span data-value="1">&#9733;</span>
-        <span data-value="2">&#9733;</span>
-        <span data-value="3">&#9733;</span>
-        <span data-value="4">&#9733;</span>
-        <span data-value="5">&#9733;</span>
-      </div>
+     <div class="star-rating" id="starRating">
+  <div class="rating-labels">
+    <span class="label-left">1</span>
+    <span class="label-right">5</span>
+  </div>
+  <span data-value="1">&#9733;</span>
+  <span data-value="2">&#9733;</span>
+  <span data-value="3">&#9733;</span>
+  <span data-value="4">&#9733;</span>
+  <span data-value="5">&#9733;</span>
+</div>
       <textarea id="comment" placeholder="ご意見・ご感想をお書きください"></textarea>
       <button id="submitBtn" class="button">送信</button>
     </div>
