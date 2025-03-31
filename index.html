@@ -1,183 +1,77 @@
+from IPython.display import display, HTML
+
+# 再度HTMLコードを表示（コード実行環境がリセットされたため）
+html_code = """
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>◯◯店 サービスアンケート</title>
+  <meta charset="UTF-8">
+  <title>アンケートテスト</title>
   <style>
-    body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: #f9f9f9;
-    }
-    .container {
-      width: 100%;
-      max-width: 500px;
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    h1 {
-      text-align: center;
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-    }
-    p {
-      text-align: center;
-      font-size: 1rem;
-    }
-    textarea {
-      width: 100%;
-      height: 120px;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 1rem;
-      resize: vertical;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    .star-rating-wrapper {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 20px 0;
-    }
-    .star-numbers {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 250px;
-      margin-bottom: 5px;
-    }
-    .star-numbers span {
-      flex: 1;
-      text-align: center;
-      font-size: 1rem;
-      color: #333;
-    }
-    .stars {
-      display: flex;
-      flex-direction: row-reverse;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 250px;
-    }
-    .stars input {
-      display: none;
-    }
-    .stars label {
-      font-size: 2.5rem;
-      color: #ccc;
-      cursor: pointer;
-      padding: 0 5px;
-    }
+    body { font-family: sans-serif; padding: 20px; background: #f9f9f9; }
+    .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .stars { display: flex; justify-content: center; margin: 20px 0; }
+    .stars label { font-size: 2rem; color: #ccc; cursor: pointer; padding: 0 5px; }
+    .stars input { display: none; }
     .stars input:checked ~ label,
     .stars label:hover,
-    .stars label:hover ~ label {
-      color: gold;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-top: 20px;
-      font-size: 1.1rem;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    #final-message {
-      margin-top: 20px;
-      font-weight: bold;
-      text-align: center;
-      color: #333;
-    }
-    .hidden {
-      display: none;
-    }
+    .stars label:hover ~ label { color: gold; }
+    textarea, button { width: 100%; margin-top: 10px; padding: 10px; font-size: 1rem; }
+    .hidden { display: none; }
+    .copy-block { margin-top: 20px; background: #f1f1f1; padding: 10px; border-radius: 5px; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>◯◯店 サービスアンケート</h1>
-    <p>当店について、評価とご感想をお願いします。</p>
-
-    <textarea id="comment" placeholder="ご意見・ご感想を自由にご記入ください（任意）"></textarea>
-
-    <div class="star-rating-wrapper">
-      <div class="star-numbers">
-        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-      </div>
-      <div class="stars" id="star-rating">
-        <input type="radio" name="star" id="star5" value="5"><label for="star5">★</label>
-        <input type="radio" name="star" id="star4" value="4"><label for="star4">★</label>
-        <input type="radio" name="star" id="star3" value="3"><label for="star3">★</label>
-        <input type="radio" name="star" id="star2" value="2"><label for="star2">★</label>
-        <input type="radio" name="star" id="star1" value="1"><label for="star1">★</label>
-      </div>
+    <div class="stars">
+      <input type="radio" name="star" id="star5" value="5"><label for="star5">★</label>
+      <input type="radio" name="star" id="star4" value="4"><label for="star4">★</label>
+      <input type="radio" name="star" id="star3" value="3"><label for="star3">★</label>
+      <input type="radio" name="star" id="star2" value="2"><label for="star2">★</label>
+      <input type="radio" name="star" id="star1" value="1"><label for="star1">★</label>
     </div>
-
-    <button onclick="submitSurvey()">送信</button>
-
-    <p id="final-message" class="hidden"></p>
+    <textarea id="comment" placeholder="ご意見・ご感想をお書きください"></textarea>
+    <button onclick="handleSubmit()">送信</button>
+    <div id="result" class="hidden"></div>
   </div>
 
   <script>
-    function submitSurvey() {
-      const stars = document.querySelector('input[name="star"]:checked');
+    function handleSubmit() {
+      const star = document.querySelector('input[name="star"]:checked');
       const comment = document.getElementById("comment").value.trim();
-      const finalMessage = document.getElementById("final-message");
+      const result = document.getElementById("result");
+      result.classList.remove("hidden");
+      result.innerHTML = "";
 
-      if (!stars) {
-        alert("評価を選択してください。");
+      if (!star) {
+        alert("星評価を選択してください。");
         return;
       }
 
-      const rating = parseInt(stars.value);
-      finalMessage.classList.remove("hidden");
+      const rating = parseInt(star.value);
 
-      if (rating <= 2 && comment === "") {
-        alert("コメントを入力してください。");
-        return;
-      }
-
-      if (rating <= 2) {
-        finalMessage.innerHTML = \`
-          ご感想ありがとうございました。<br>
-          もしこの内容が、これからご来店を検討される方の参考になると感じられましたら、<br>
-          「◯◯店」とGoogleで検索いただくことで、投稿も可能です。<br>
-          ※ご投稿はもちろん任意です。<br><br>
-          今回は誠にありがとうございました。<br>
-          今後も皆さまにとってより心地よいお店を目指してまいります。<br>
-          引き続きどうぞよろしくお願いいたします。
-        \`;
+      if (rating >= 3) {
+        const message = `<p>ご感想ありがとうございました。<br>このコメントをGoogleレビューに投稿しますか？<br><small>※ご投稿はもちろん任意です。</small></p>`;
+        const commentBlock = comment ? `<div class="copy-block"><textarea readonly>${comment}</textarea><button onclick="copyComment()">この内容をコピー</button></div>` : "";
+        const buttons = `
+          <button onclick="window.open('https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8','_blank')">はい、投稿する</button>
+          <button onclick="document.getElementById('result').innerHTML='ご協力ありがとうございました。'">今回は投稿しない</button>`;
+        result.innerHTML = commentBlock + message + buttons;
       } else {
-        const url = "https://search.google.com/local/writereview?placeid=ChIJbShvzA6NGGAR-mNLA_ED9t8";
-        if (comment) {
-          navigator.clipboard.writeText(comment).then(() => {
-            window.open(url, "_blank");
-            finalMessage.innerHTML = "コメントをコピーしました。Googleレビュー投稿画面で貼り付けて投稿いただけます。";
-          }).catch(() => {
-            window.open(url, "_blank");
-            finalMessage.innerHTML = "Googleレビュー投稿画面が開きました。";
-          });
-        } else {
-          window.open(url, "_blank");
-          finalMessage.innerHTML = "Googleレビュー投稿画面が開きました。ご投稿はもちろん任意です。";
-        }
+        result.innerHTML = "<p>この後の低評価フローは別途設計中です。</p>";
       }
+    }
+
+    function copyComment() {
+      const text = document.querySelector(".copy-block textarea").value;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("コメントをコピーしました！");
+      });
     }
   </script>
 </body>
 </html>
+"""
+
+display(HTML(html_code))
